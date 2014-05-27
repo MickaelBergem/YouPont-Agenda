@@ -2,5 +2,7 @@
 <resources>
 
     <string name="app_name">YouPont Mobile</string>
+    <string name="app_UA">YouPont-Mobile</string>
+    <string name="app_version">0.1</string>
 
 </resources>

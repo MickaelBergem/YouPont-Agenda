@@ -45,6 +45,8 @@ public class ServiceHandler {
 		try {
 			// http client
 			DefaultHttpClient httpClient = new DefaultHttpClient();
+//             httpClient.getParams().setParameter("User-agent", "@string/app_UA"+"@string/app_version");
+            httpClient.getParams().setParameter("User-agent", "YouPont-Mobile-0.1");
 			HttpEntity httpEntity = null;
 			HttpResponse httpResponse = null;
 			
