@@ -97,7 +97,7 @@ public class MainActivity extends ListActivity {
 			super.onPreExecute();
 			// Showing progress dialog
 			pDialog = new ProgressDialog(MainActivity.this);
-			pDialog.setMessage("Récupération des événements...");
+			pDialog.setMessage("RÃ©cupÃ©ration des Ã©vÃ¨nements...");
 			pDialog.setCancelable(false);
 			pDialog.show();
 
@@ -143,8 +143,8 @@ public class MainActivity extends ListActivity {
 						long date_fin0 = v.getLong(TAG_DATE_FIN) * 1000;
 						java.util.Date date_fin1 = new java.util.Date(date_fin0);
 						
-						// Create the date format wanted ("lundi 21 décembre à 15h45")
-						java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("EEEE d MMMM yyyy 'à' HH'h'mm", java.util.Locale.FRENCH);
+						// Create the date format wanted ("lundi 21 dÃ©cembre Ã  15h45")
+						java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("EEEE d MMMM yyyy 'Ã ' HH'h'mm", java.util.Locale.FRENCH);
 						
 						// Apply this format to the date previously got
 						String date_deb = sdf.format(date_deb1);
