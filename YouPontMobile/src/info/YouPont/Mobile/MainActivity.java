@@ -1,6 +1,6 @@
 package info.YouPont.Mobile;
 
-import YouPont.Mobile.R;
+import youPont.mobile.R;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -22,12 +22,31 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+/**** OFFLINE SYNCHRO (2) ****/
+
+/*
+ * import java.io.BufferedReader;
+ * import java.io.DataInputStream;
+ * import java.io.File;
+ * import java.io.FileInputStream;
+ * import java.io.FileOutputStream;
+ * import java.io.IOException;
+ * import java.io.InputStreamReader;
+ 
+ * import android.app.Activity;
+ * import android.content.Context;
+ * import android.content.ContextWrapper;
+ */
+
 public class MainActivity extends ListActivity {
 
 	private ProgressDialog pDialog;
 
 	// URL to get JSON events
 	private static String url = "http://dumbo.securem.eu/staticapi-getall.txt";
+	
+	// Name of the file used to store JSON
+	String jsonStorage_FileName = "json_data.txt";
 
 	// JSON Node names
 	private static final String TAG_EVENEMENTS = "evenements";
@@ -87,9 +106,10 @@ public class MainActivity extends ListActivity {
 		new GetEvenements().execute();
 	}
 
-	/**
+	/*
 	 * Async task class to get json by making HTTP call
-	 * */
+	 * 
+	 */
 	private class GetEvenements extends AsyncTask<Void, Void, Void> {
 
 		@Override
@@ -97,7 +117,7 @@ public class MainActivity extends ListActivity {
 			super.onPreExecute();
 			// Showing progress dialog
 			pDialog = new ProgressDialog(MainActivity.this);
-			pDialog.setMessage("RÃ©cupÃ©ration des Ã©vÃ¨nements...");
+			pDialog.setMessage("Récupération des événements...");
 			pDialog.setCancelable(false);
 			pDialog.show();
 
@@ -110,13 +130,56 @@ public class MainActivity extends ListActivity {
 			ServiceHandler sh = new ServiceHandler();
 
 			// Making a request to url and getting response
-			String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
+			String jsonString = sh.makeServiceCall(url, ServiceHandler.GET);
+			
+			/**** OFFLINE SYNCHRO (1) ****/
+			/*
+			 * FileOutputStream jsonStorageOut = openFileOutput(jsonStorage_FileName, Context.MODE_PRIVATE);
+			 * jsonStorageOut.write(jsonString.getBytes());
+			 * jsonStorageOut.close();
+			 * 
+			 * FileInputStream jsonStorageIn = openFileInput(jsonStorage_FileName);
+			 * jsonStorageIn.read(jsonString.getBytes());
+			 * jsonStorageIn.close();
+			 *
+			 */
+			
+			/**** OFFLINE SYCHRO (2) ****/
+			/*
+			 * >>>>> RECUPERATION DU STRING ET CONVERSION TO FILE
+			 * if (jsonString != null) {
+   			 * 	try {
+    		 *   FileOutputStream fos = new FileOutputStream(myInternalFile); << déclarer un file au début
+    		 *   fos.write(jsonString.getText().toString().getBytes());
+    		 *   fos.close();
+   			 *  } catch (IOException e) {
+    		 *   e.printStackTrace();
+    		 *  }
+			 * }
+			 *
+			 * >>>>> RECUPERATION DU FILE ET CONVERSION TO STRING
+			 * if (jsonString == null) {
+   			 *  try {
+    		 *   FileInputStream fis = new FileInputStream(myInternalFile); << déclarer un file au début
+    		 *   DataInputStream dis = new DataInputStream(fis);
+    		 *   BufferedReader br = new BufferedReader(new InputStreamReader(dis));
+    		 *   String strLine;
+    		 *   while ((strLine = br.readLine()) != null) {
+     		 *    myData = myData + strLine; << déclarer un string "myData" au début
+    		 *   }
+    		 *   dis.close();
+      		 *  } catch (IOException e) {
+    		 *   e.printStackTrace();
+   			 *  }
+   			 *  jsonString = myData; << déclarer un string "myData" au début
+			 * }
+			 */
 
-			Log.d("Response: ", "> " + jsonStr);
+			Log.d("Response: ", "> " + jsonString);
 
-			if (jsonStr != null) {
+			if (jsonString != null) {
 				try {
-					JSONObject jsonObj = new JSONObject(jsonStr);
+					JSONObject jsonObj = new JSONObject(jsonString);
 					
 					// Getting JSON Array node
 					evenements = jsonObj.getJSONArray(TAG_EVENEMENTS);
