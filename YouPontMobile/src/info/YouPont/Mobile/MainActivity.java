@@ -1,6 +1,7 @@
 package info.YouPont.Mobile;
 
 import youPont.mobile.R;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListAdapter;
@@ -22,21 +24,20 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-/**** OFFLINE SYNCHRO (2) ****/
+/**** OFFLINE SYNCHRO ****/
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.DataInputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.FileNotFoundException;
 
-/*
- * import java.io.BufferedReader;
- * import java.io.DataInputStream;
- * import java.io.File;
- * import java.io.FileInputStream;
- * import java.io.FileOutputStream;
- * import java.io.IOException;
- * import java.io.InputStreamReader;
- 
- * import android.app.Activity;
- * import android.content.Context;
- * import android.content.ContextWrapper;
- */
+import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
+
 
 public class MainActivity extends ListActivity {
 
@@ -45,8 +46,10 @@ public class MainActivity extends ListActivity {
 	// URL to get JSON events
 	private static String url = "http://dumbo.securem.eu/staticapi-getall.txt";
 	
-	// Name of the file used to store JSON
-	String jsonStorage_FileName = "json_data.txt";
+	// File used to store JSON data
+	File json_InternalFile;
+	String jsonStorage_FileName = "jsonStorage_FileName";
+	String jsonStorage_FilePath = "jsonStorage_FilePath";
 
 	// JSON Node names
 	private static final String TAG_EVENEMENTS = "evenements";
@@ -131,6 +134,7 @@ public class MainActivity extends ListActivity {
 
 			// Making a request to url and getting response
 			String jsonString = sh.makeServiceCall(url, ServiceHandler.GET);
+			Log.d("jsonString_value: ", "> " + jsonString);
 			
 			/**** OFFLINE SYNCHRO (1) ****/
 			/*
@@ -144,36 +148,46 @@ public class MainActivity extends ListActivity {
 			 *
 			 */
 			
-			/**** OFFLINE SYCHRO (2) ****/
-			/*
-			 * >>>>> RECUPERATION DU STRING ET CONVERSION TO FILE
-			 * if (jsonString != null) {
-   			 * 	try {
-    		 *   FileOutputStream fos = new FileOutputStream(myInternalFile); << déclarer un file au début
-    		 *   fos.write(jsonString.getText().toString().getBytes());
-    		 *   fos.close();
-   			 *  } catch (IOException e) {
-    		 *   e.printStackTrace();
-    		 *  }
-			 * }
-			 *
-			 * >>>>> RECUPERATION DU FILE ET CONVERSION TO STRING
-			 * if (jsonString == null) {
-   			 *  try {
-    		 *   FileInputStream fis = new FileInputStream(myInternalFile); << déclarer un file au début
-    		 *   DataInputStream dis = new DataInputStream(fis);
-    		 *   BufferedReader br = new BufferedReader(new InputStreamReader(dis));
-    		 *   String strLine;
-    		 *   while ((strLine = br.readLine()) != null) {
-     		 *    myData = myData + strLine; << déclarer un string "myData" au début
-    		 *   }
-    		 *   dis.close();
-      		 *  } catch (IOException e) {
-    		 *   e.printStackTrace();
-   			 *  }
-   			 *  jsonString = myData; << déclarer un string "myData" au début
-			 * }
-			 */
+			/**** OFFLINE SYCHRO ****/
+			
+			ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
+			File data_directory = contextWrapper.getDir(jsonStorage_FilePath, 0);
+			json_InternalFile = new File(data_directory , jsonStorage_FileName);
+			
+			 // RECUPERATION DU STRING ET CONVERSION TO FILE
+			 if (jsonString != null) {
+   			  try {
+    		   FileOutputStream fos = new FileOutputStream(json_InternalFile); // openFileOutput(jsonStorage_FileName, 0); //  
+    		   fos.write(jsonString.getBytes());
+    		   fos.close();
+   			  } catch (FileNotFoundException e) {
+   				Log.e("Response: ", "> " + "File not found");
+                e.printStackTrace();
+   			  } catch (IOException e) {
+   			    Log.e("Response: ", "> " + "IO Exception");
+    		    e.printStackTrace();
+    		  }
+			 }
+			 
+			 // RECUPERATION DU FILE ET CONVERSION TO STRING
+			if (jsonString == null) {
+   			  try {
+    		   FileInputStream fis = new FileInputStream(json_InternalFile); 
+    		   DataInputStream dis = new DataInputStream(fis);
+    		   BufferedReader br = new BufferedReader(new InputStreamReader(dis));
+    		   String strLine;
+    		   jsonString = "";
+    		   while ((strLine = br.readLine()) != null) {
+     		    jsonString = jsonString + strLine;
+    		   }
+    		   dis.close();
+   			  } catch (FileNotFoundException e) {
+               e.printStackTrace();
+      		  } catch (IOException e) {
+    		   e.printStackTrace();
+   			  }
+			 }
+			
 
 			Log.d("Response: ", "> " + jsonString);
 
