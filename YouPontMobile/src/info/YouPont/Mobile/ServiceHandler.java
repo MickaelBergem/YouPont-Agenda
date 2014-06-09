@@ -24,7 +24,8 @@ public class ServiceHandler {
 	public final static int POST = 2;
 
 	// URL to get JSON events
-	private final static String url = "http://upont.enpc.org/api.php";
+//     private final static String url = "http://upont.enpc.org/api.php"; [URL du serveur de production]
+    private final static String url = "http://dev-intranet.enpc.org/api.php"; // Serveur de développement
 
 	public ServiceHandler() {
 

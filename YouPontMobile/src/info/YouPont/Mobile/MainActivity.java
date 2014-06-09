@@ -219,7 +219,7 @@ public class MainActivity extends ListActivity {
 						String details = v.getString(TAG_DETAILS);
 						String nb_participants = v.getString(TAG_NB_PARTICIPANTS);
 						String lieu = v.getString(TAG_LIEU);
-						String couleur = v.getString(TAG_COULEUR);
+// 						String couleur = v.getString(TAG_COULEUR);
 
 						/** Get and convert dates **/
 						// Get the date from Timestamp and convert to Date
@@ -245,7 +245,7 @@ public class MainActivity extends ListActivity {
 						evenement.put(TAG_ID, id);
 						evenement.put(TAG_LABEL, label);
 						evenement.put(TAG_DATE_DEB, date_deb);
-						evenement.put(TAG_COULEUR, couleur);
+// 						evenement.put(TAG_COULEUR, couleur);
 						evenement.put(TAG_DATE_FIN, date_fin);
 						evenement.put(TAG_DETAILS, details);
 						evenement.put(TAG_NB_PARTICIPANTS, nb_participants);
