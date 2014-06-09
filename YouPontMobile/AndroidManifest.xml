@@ -7,28 +7,37 @@
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="19" />
-    
+
     <!-- Internet permission -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Network State Permissions -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
     <application
+        android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:allowBackup="true" >
+        android:label="@string/app_name" >
         <activity
-            android:label="@string/app_name"
-            android:name="info.YouPont.Mobile.MainActivity" >
-            <intent-filter >
+            android:name="info.YouPont.Mobile.MainActivity"
+            android:label="@string/app_name" >
+        </activity>
+
+        <!-- Single List Item Activity -->
+        <activity
+            android:name="info.YouPont.Mobile.SingleEvenementActivity"
+            android:label="@string/app_name" >
+        </activity>
+
+        <!-- Login Activity -->
+        <activity
+            android:name="info.YouPont.Mobile.LoginActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        
-        <!-- Single List Item Activity -->
-        <activity
-            android:label="@string/app_name"
-            android:name="info.YouPont.Mobile.SingleEvenementActivity" >
         </activity>
     </application>
 

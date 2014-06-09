@@ -1,42 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  android:padding="10dp">
-<ScrollView 
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content">
-<LinearLayout
-  android:orientation="vertical"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp" >
 
-  <!-- Label Label -->
-  <TextView android:id="@+id/label_label"
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/chaud_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dip"
+                android:paddingTop="6dip"
+                android:text="@string/chaud_text" />
+
+            <Button
+                android:id="@+id/cacher_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dip"
+                android:paddingTop="6dip"
+                android:text="@string/cacher_text" />
+        </LinearLayout>
+
+        <!-- Label Label -->
+
+        <TextView
+            android:id="@+id/label_label"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="25dip"
-            android:textStyle="bold"
-            android:paddingTop="10dip"
             android:paddingBottom="10dip"
-            android:textColor="#43bd00"/>
-  <!-- Date de debut Label -->
-  <TextView android:id="@+id/date_deb_label"
+            android:paddingTop="10dip"
+            android:textColor="#43bd00"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+        <!-- Date de debut Label -->
+
+        <TextView
+            android:id="@+id/date_deb_label"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textColor="#acacac"/>
-  <!-- Lieu Label -->
-  <TextView android:id="@+id/lieu_label"
-      		android:layout_width="fill_parent"
-      		android:layout_height="wrap_content"
-      		android:textStyle="bold"/>
-  <!-- Details Label -->
-  <TextView android:id="@+id/details_label"
-      		android:layout_width="fill_parent"
-      		android:layout_height="wrap_content"
-      		android:visibility="visible"/>"
-</LinearLayout>
+            android:textColor="#acacac" />
+
+        <!-- Lieu Label -->
+
+        <TextView
+            android:id="@+id/lieu_label"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold" />
+
+        <!-- Details Label -->
+
+        <TextView
+            android:id="@+id/details_label"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible" />
+
+        <!-- ID label -->
+
+        <TextView
+            android:id="@+id/id_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+    </LinearLayout>
+
 </ScrollView>
-</LinearLayout>

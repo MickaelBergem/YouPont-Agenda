@@ -1,51 +1,45 @@
 package info.YouPont.Mobile;
 
-import youPont.mobile.R;
-
+/**** OFFLINE SYNCHRO ****/
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import org.apache.http.NameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import youPont.mobile.R;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-
-/**** OFFLINE SYNCHRO ****/
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.DataInputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.FileNotFoundException;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.ContextWrapper;
+import android.widget.Toast;
 
 
 public class MainActivity extends ListActivity {
 
 	private ProgressDialog pDialog;
 
-	// URL to get JSON events
-	private static String url = "http://dumbo.securem.eu/staticapi-getall.txt";
-	
 	// File used to store JSON data
 	File json_InternalFile;
 	String jsonStorage_FileName = "jsonStorage_FileName";
@@ -61,7 +55,9 @@ public class MainActivity extends ListActivity {
 	private static final String TAG_LIEU = "lieu";
 	private static final String TAG_COULEUR = "couleur";
 	private static final String TAG_NB_PARTICIPANTS = "nb_participants";
-	
+
+	private ConnectionDetector cd;
+
 	// evenements JSONArray
 	JSONArray evenements = null;
 
@@ -73,8 +69,10 @@ public class MainActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		evenementsList = new ArrayList<HashMap<String, String>>();
+		cd = new ConnectionDetector(this);
 
+		evenementsList = new ArrayList<HashMap<String, String>>();
+		
 		ListView lv = getListView();
 
 		// Listview on item click listener (for single event activity)
@@ -92,6 +90,8 @@ public class MainActivity extends ListActivity {
 						.getText().toString();
 				String details = ((TextView) view.findViewById(R.id.details))
 						.getText().toString();
+				String idEvt = ((TextView) view.findViewById(R.id.id))
+						.getText().toString();
 
 				// Starting single event activity
 				Intent in = new Intent(getApplicationContext(),
@@ -100,13 +100,19 @@ public class MainActivity extends ListActivity {
 				in.putExtra(TAG_DATE_DEB, date_deb);
 				in.putExtra(TAG_LIEU, lieu);
 				in.putExtra(TAG_DETAILS, details);
+				in.putExtra(TAG_ID, idEvt);				
 				startActivity(in);
 
 			}
 		});
 
-		// Calling async task to get json
-		new GetEvenements().execute();
+		if(cd.isConnectingToInternet()){
+			// Calling async task to get json
+			new GetEvenements().execute();
+		} else {
+			// Internet connection is not present
+			Toast.makeText(MainActivity.this, "Pas de connexion Internet", Toast.LENGTH_SHORT).show();;
+		}
 	}
 
 	/*
@@ -120,81 +126,85 @@ public class MainActivity extends ListActivity {
 			super.onPreExecute();
 			// Showing progress dialog
 			pDialog = new ProgressDialog(MainActivity.this);
-			pDialog.setMessage("Récupération des événements...");
+			pDialog.setMessage("RÃ©cupÃ©ration des Ã©vÃ©nements...");
 			pDialog.setCancelable(false);
 			pDialog.show();
 
 		}
-		
+
 		// Get JSON data
 		@Override
 		protected Void doInBackground(Void... arg0) {
 			// Creating service handler class instance
 			ServiceHandler sh = new ServiceHandler();
 
+			NameValuePair getAllEventsVP = new NameValuePair() {
+
+				@Override
+				public String getValue() {
+					return "event_getall";
+				}
+
+				@Override
+				public String getName() {
+					return "action";
+				}
+			};
+
+			List<NameValuePair> listParams = new ArrayList<NameValuePair>();
+			listParams.add(getAllEventsVP);
+
 			// Making a request to url and getting response
-			String jsonString = sh.makeServiceCall(url, ServiceHandler.GET);
+			String jsonString = sh.makeServiceCall(ServiceHandler.GET, listParams);
 			Log.d("jsonString_value: ", "> " + jsonString);
-			
-			/**** OFFLINE SYNCHRO (1) ****/
-			/*
-			 * FileOutputStream jsonStorageOut = openFileOutput(jsonStorage_FileName, Context.MODE_PRIVATE);
-			 * jsonStorageOut.write(jsonString.getBytes());
-			 * jsonStorageOut.close();
-			 * 
-			 * FileInputStream jsonStorageIn = openFileInput(jsonStorage_FileName);
-			 * jsonStorageIn.read(jsonString.getBytes());
-			 * jsonStorageIn.close();
-			 *
-			 */
-			
+
 			/**** OFFLINE SYCHRO ****/
-			
+
 			ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
 			File data_directory = contextWrapper.getDir(jsonStorage_FilePath, 0);
 			json_InternalFile = new File(data_directory , jsonStorage_FileName);
-			
-			 // RECUPERATION DU STRING ET CONVERSION TO FILE
-			 if (jsonString != null) {
-   			  try {
-    		   FileOutputStream fos = new FileOutputStream(json_InternalFile); // openFileOutput(jsonStorage_FileName, 0); //  
-    		   fos.write(jsonString.getBytes());
-    		   fos.close();
-   			  } catch (FileNotFoundException e) {
-   				Log.e("Response: ", "> " + "File not found");
-                e.printStackTrace();
-   			  } catch (IOException e) {
-   			    Log.e("Response: ", "> " + "IO Exception");
-    		    e.printStackTrace();
-    		  }
-			 }
-			 
-			 // RECUPERATION DU FILE ET CONVERSION TO STRING
+
+			// RECUPERATION DU STRING ET CONVERSION TO FILE
+			if (jsonString != null) {
+				try {
+					FileOutputStream fos = new FileOutputStream(json_InternalFile); // openFileOutput(jsonStorage_FileName, 0); //  
+					fos.write(jsonString.getBytes());
+					fos.close();
+				} catch (FileNotFoundException e) {
+					Log.e("Response: ", "> " + "File not found");
+					e.printStackTrace();
+				} catch (IOException e) {
+					Log.e("Response: ", "> " + "IO Exception");
+					e.printStackTrace();
+				}
+			}
+
+			// RECUPERATION DU FILE ET CONVERSION TO STRING
 			if (jsonString == null) {
-   			  try {
-    		   FileInputStream fis = new FileInputStream(json_InternalFile); 
-    		   DataInputStream dis = new DataInputStream(fis);
-    		   BufferedReader br = new BufferedReader(new InputStreamReader(dis));
-    		   String strLine;
-    		   jsonString = "";
-    		   while ((strLine = br.readLine()) != null) {
-     		    jsonString = jsonString + strLine;
-    		   }
-    		   dis.close();
-   			  } catch (FileNotFoundException e) {
-               e.printStackTrace();
-      		  } catch (IOException e) {
-    		   e.printStackTrace();
-   			  }
-			 }
-			
+				try {
+					FileInputStream fis = new FileInputStream(json_InternalFile); 
+					DataInputStream dis = new DataInputStream(fis);
+					BufferedReader br = new BufferedReader(new InputStreamReader(dis));
+					String strLine;
+					jsonString = "";
+					while ((strLine = br.readLine()) != null) {
+						jsonString = jsonString + strLine;
+					}
+					dis.close();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
 
 			Log.d("Response: ", "> " + jsonString);
 
 			if (jsonString != null) {
 				try {
 					JSONObject jsonObj = new JSONObject(jsonString);
-					
+
 					// Getting JSON Array node
 					evenements = jsonObj.getJSONArray(TAG_EVENEMENTS);
 
@@ -202,7 +212,7 @@ public class MainActivity extends ListActivity {
 					for (int i = 0; i < evenements.length(); i++) {
 						// Get object "evenements"
 						JSONObject v = evenements.getJSONObject(i);
-						
+
 						// Get all items for the event
 						String id = v.getString(TAG_ID);
 						String label = v.getString(TAG_LABEL);
@@ -210,19 +220,19 @@ public class MainActivity extends ListActivity {
 						String nb_participants = v.getString(TAG_NB_PARTICIPANTS);
 						String lieu = v.getString(TAG_LIEU);
 						String couleur = v.getString(TAG_COULEUR);
-						
+
 						/** Get and convert dates **/
 						// Get the date from Timestamp and convert to Date
 						// * 1000 is to convert from s to ms
 						long date_deb0 = v.getLong(TAG_DATE_DEB) * 1000;
 						java.util.Date date_deb1 = new java.util.Date(date_deb0);
-						
+
 						long date_fin0 = v.getLong(TAG_DATE_FIN) * 1000;
 						java.util.Date date_fin1 = new java.util.Date(date_fin0);
-						
+
 						// Create the date format wanted ("lundi 21 dÃ©cembre Ã  15h45")
 						java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("EEEE d MMMM yyyy 'Ã ' HH'h'mm", java.util.Locale.FRENCH);
-						
+
 						// Apply this format to the date previously got
 						String date_deb = sdf.format(date_deb1);
 						String date_fin = sdf.format(date_fin1);
@@ -266,8 +276,8 @@ public class MainActivity extends ListActivity {
 			ListAdapter adapter = new SimpleAdapter(
 					MainActivity.this, evenementsList,
 					R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
-							TAG_LIEU, TAG_DETAILS }, new int[] { R.id.label,
-							R.id.date_deb, R.id.lieu, R.id.details });
+							TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
+							R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
 
 			setListAdapter(adapter);
 		}

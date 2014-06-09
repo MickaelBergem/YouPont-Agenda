@@ -8,6 +8,7 @@
     android:paddingRight="10dp" >
 
     <!-- Label Label -->
+
     <TextView
         android:id="@+id/label"
         android:layout_width="fill_parent"
@@ -19,6 +20,7 @@
         android:textStyle="bold" />
 
     <!-- Date_Deb label -->
+
     <TextView
         android:id="@+id/date_deb"
         android:layout_width="fill_parent"
@@ -27,6 +29,7 @@
         android:textColor="#acacac" />
 
     <!-- Lieu label -->
+
     <TextView
         android:id="@+id/lieu"
         android:layout_width="wrap_content"
@@ -34,14 +37,25 @@
         android:gravity="left"
         android:textColor="#5d5d5d"
         android:textStyle="bold" />
-    
-    <!-- Lieu label -->
+
+    <!-- Details label -->
+
     <TextView
         android:id="@+id/details"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="left"
         android:textColor="#FFFFFF"
-        android:visibility="gone"/>
+        android:visibility="gone" />
+
+    <!-- ID label -->
+
+    <TextView
+        android:id="@+id/id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:textColor="#FFFFFF"
+        android:visibility="gone" />
 
 </LinearLayout>

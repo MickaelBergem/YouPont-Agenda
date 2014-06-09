@@ -4,5 +4,10 @@
     <string name="app_name">YouPont Mobile</string>
     <string name="app_UA">YouPont-Mobile</string>
     <string name="app_version">0.1</string>
+    <string name="chaud_text">Chaud !</string>
+    <string name="cacher_text">Cacher</string>
+    <string name="hint_username">Nom d\'utilisateur</string>
+    <string name="hint_password">Mot de passe</string>
+    <string name="connection_btn">Connexion</string>
 
 </resources>
