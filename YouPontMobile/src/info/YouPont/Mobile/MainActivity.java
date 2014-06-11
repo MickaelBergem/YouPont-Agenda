@@ -46,7 +46,9 @@ public class MainActivity extends ListActivity {
 	String jsonStorage_FilePath = "jsonStorage_FilePath";
 
 	// JSON Node names
-	private static final String TAG_EVENEMENTS = "evenements";
+    private static final String TAG_EVENEMENTS = "events";
+    private static final String TAG_REPONSES_USER = "reponses_perso";
+    private static final String TAG_EVENEMENTS_DATA = "evenements";
 	private static final String TAG_ID = "id";
 	private static final String TAG_LABEL = "label";
 	private static final String TAG_DETAILS = "details";
@@ -59,7 +61,9 @@ public class MainActivity extends ListActivity {
 	private ConnectionDetector cd;
 
 	// evenements JSONArray
-	JSONArray evenements = null;
+    JSONObject evenements_data = null;
+    JSONArray evenements = null;
+//     JSONObject reponses_user = null;
 
 	// Hashmap for ListView
 	ArrayList<HashMap<String, String>> evenementsList;
@@ -138,25 +142,41 @@ public class MainActivity extends ListActivity {
 			// Creating service handler class instance
 			ServiceHandler sh = new ServiceHandler();
 
-			NameValuePair getAllEventsVP = new NameValuePair() {
+            NameValuePair getAllEventsVP = new NameValuePair() {
 
-				@Override
-				public String getValue() {
-					return "event_getall";
-				}
+                @Override
+                public String getValue() {
+                    return "event_getall";
+                }
 
-				@Override
-				public String getName() {
-					return "action";
-				}
-			};
+                @Override
+                public String getName() {
+                    return "action";
+                }
+            };
+            
+            NameValuePair TokenVP = new NameValuePair() {
+
+                @Override
+                public String getValue() {
+                    // TODO: token hardcodé, à récupérer dynamiquement à la connexion !
+                    return "3ef6d2274e3f53d761ef9626b8ca54c10cf191257f524810c8dfdbf620ee7b77170a1bb7226de060";
+                }
+
+                @Override
+                public String getName() {
+                    return "token";
+                }
+            };
 
 			List<NameValuePair> listParams = new ArrayList<NameValuePair>();
-			listParams.add(getAllEventsVP);
+            listParams.add(getAllEventsVP);
+            listParams.add(TokenVP);
+            listParams.add(TokenVP);
 
 			// Making a request to url and getting response
 			String jsonString = sh.makeServiceCall(ServiceHandler.GET, listParams);
-			Log.d("jsonString_value: ", "> " + jsonString);
+			Log.d("jsonString_value (event_getall) : ", "> " + jsonString);
 
 			/**** OFFLINE SYCHRO ****/
 
@@ -205,9 +225,14 @@ public class MainActivity extends ListActivity {
 				try {
 					JSONObject jsonObj = new JSONObject(jsonString);
 
+					Log.d("Parsing evenements_data", "> " + TAG_EVENEMENTS_DATA);
 					// Getting JSON Array node
-					evenements = jsonObj.getJSONArray(TAG_EVENEMENTS);
-
+					evenements_data = jsonObj.getJSONObject(TAG_EVENEMENTS_DATA);
+					
+                    Log.d("Parsing the events data...","evenements_data");
+                    evenements = ((JSONObject)evenements_data).getJSONArray(TAG_EVENEMENTS);
+//                     reponses_user = evenements_data.getJSONObject(TAG_REPONSES_USER);
+					
 					// Looping through all Evenements
 					for (int i = 0; i < evenements.length(); i++) {
 						// Get object "evenements"

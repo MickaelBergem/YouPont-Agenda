@@ -160,15 +160,30 @@ public class SingleEvenementActivity  extends Activity {
 					return "reponse";
 				}
 			};
+			
+            NameValuePair TokenVP = new NameValuePair() {
 
+                @Override
+                public String getValue() {
+                    // TODO: token hardcodé, à récupérer dynamiquement à la connexion !
+                    return "3ef6d2274e3f53d761ef9626b8ca54c10cf191257f524810c8dfdbf620ee7b77170a1bb7226de060";
+                }
+
+                @Override
+                public String getName() {
+                    return "token";
+                }
+            };
+            
 			List<NameValuePair> listParams = new ArrayList<NameValuePair>();
 			listParams.add(eventReponseVP);
 			listParams.add(eventIdVP);
-			listParams.add(reponseVP);
+            listParams.add(reponseVP);
+            listParams.add(TokenVP);
 
 			// Making a request to url and getting response
 			String jsonString = sh.makeServiceCall(ServiceHandler.GET, listParams);
-			Log.d("jsonString_value: ", "> " + jsonString);
+			Log.d("jsonString_value(reponse): ", "> " + jsonString);
 
 			if (jsonString != null) {
 				try {

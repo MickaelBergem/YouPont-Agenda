@@ -168,12 +168,12 @@ public class LoginActivity extends Activity{
 					// Get all items for the event
 					code_erreur = v.getString(TAG_ERR_CODE);
 					reponse = v.getString(TAG_REP);
-					//fin = v.getString(TAG_FIN);
 
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			} else {
+                // TODO : afficher un message d'erreur à l'écran
 				Log.e("ServiceHandler", "Couldn't get any data from the url");
 			}
 
