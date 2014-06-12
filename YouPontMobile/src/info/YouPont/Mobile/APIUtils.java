@@ -38,7 +38,6 @@ public class APIUtils {
 
 			SharedPreferences settings = activity.getSharedPreferences("APIAuth", 0);
 			if (settings.contains("userToken")) {
-				Log.d("VideoSpot Maintenance", "Restore user information from saved preferences");
 				mLastToken = settings.getString("userToken", null);
 			}
 
