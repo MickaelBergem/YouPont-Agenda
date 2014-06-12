@@ -1,9 +1,5 @@
 package info.YouPont.Mobile;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.http.NameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,10 +19,13 @@ import android.widget.Toast;
 public class LoginActivity extends Activity{
 	private ProgressDialog pDialog;
 
-	private static final String TAG_ERR_CODE = "code_erreur";
 	private static final String TAG_REP = "reponse";
-	//private static final String TAG_FIN = "fin";
-	
+	private static final String TAG_REUSSITE = "reussite";
+	private static final String TAG_PRENOM = "prenom";
+	private static final String TAG_NOM = "nom";
+	private static final String TAG_UID = "user_id";
+	private static final String TAG_RAISON = "raison";
+
 	private ConnectionDetector cd;
 
 	@Override
@@ -37,7 +36,7 @@ public class LoginActivity extends Activity{
 		setContentView(R.layout.activity_login);
 
 		cd = new ConnectionDetector(this);
-		
+
 		/* Bind the button to the proper event functions */
 		((Button)findViewById(R.id.login_button)).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -60,10 +59,8 @@ public class LoginActivity extends Activity{
 		}else {
 			if(cd.isConnectingToInternet()){
 				Login loginCall = new Login(login, passwd);
-//				loginCall.execute();
-				Intent in = new Intent(getApplicationContext(),
-						MainActivity.class);
-				startActivity(in);
+				loginCall.execute();
+
 			} else {
 				// Internet connection is not present
 				Toast.makeText(LoginActivity.this, "Pas de connexion Internet", Toast.LENGTH_SHORT).show();;
@@ -82,7 +79,7 @@ public class LoginActivity extends Activity{
 	private class Login extends AsyncTask<Void, Void, Void> {
 		private String login, password;
 
-		private String code_erreur, reponse;//, fin;
+		private String reussite, prenom, nom, user_id, raison;//, fin;
 
 		public Login(String login, String password){
 			this.login = login;
@@ -103,77 +100,30 @@ public class LoginActivity extends Activity{
 		// Get JSON data
 		@Override
 		protected Void doInBackground(Void... arg0) {
-			// Creating service handler class instance
-			ServiceHandler sh = new ServiceHandler();
-
-			NameValuePair actionLoginVP = new NameValuePair() {
-				@Override
-				public String getValue() {
-					return "connexion";
-				}
-				@Override
-				public String getName() {
-					return "action";
-				}
-			};
-
-			NameValuePair loginVP = new NameValuePair() {
-				@Override
-				public String getValue() {
-					return login;
-				}
-				@Override
-				public String getName() {
-					return "id";
-				}
-			};
-
-			NameValuePair passwordVP = new NameValuePair() {
-				@Override
-				public String getValue() {
-					return password;
-				}
-				@Override
-				public String getName() {
-					return "pass";
-				}
-			};
-
-			NameValuePair appIdVP = new NameValuePair() {
-				@Override
-				public String getValue() {
-					return "1";
-				}
-				@Override
-				public String getName() {
-					return "appID";
-				}
-			};
-
-			List<NameValuePair> listParams = new ArrayList<NameValuePair>();
-			listParams.add(actionLoginVP);
-			listParams.add(loginVP);
-			listParams.add(passwordVP);
-			listParams.add(appIdVP);
-
-			// Making a request to url and getting response
-			String jsonString = sh.makeServiceCall(ServiceHandler.GET, listParams);
-			Log.d("jsonString_value: ", "> " + jsonString);
+			String jsonString = APIUtils.createSession(LoginActivity.this, login, password);
 
 			if (jsonString != null) {
 				try {
 					JSONObject v = new JSONObject(jsonString);
 
+					JSONObject reponse = v.getJSONObject(TAG_REP);
 
-					// Get all items for the event
-					code_erreur = v.getString(TAG_ERR_CODE);
-					reponse = v.getString(TAG_REP);
+
+					reussite = reponse.getString(TAG_REUSSITE);
+
+					if(reussite.equals("false"))
+						raison = reponse.getString(TAG_RAISON);
+					else if (reussite.equals("true")){
+						prenom = reponse.getString(TAG_PRENOM);
+						nom = reponse.getString(TAG_NOM);
+						user_id = reponse.getString(TAG_UID);
+					}
 
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			} else {
-                // TODO : afficher un message d'erreur à l'écran
+				// TODO : afficher un message d'erreur à l'écran
 				Log.e("ServiceHandler", "Couldn't get any data from the url");
 			}
 
@@ -187,10 +137,18 @@ public class LoginActivity extends Activity{
 			if (pDialog.isShowing())
 				pDialog.dismiss();
 
-			if(Integer.parseInt(code_erreur) == 0)
-				Toast.makeText(LoginActivity.this, "Effectué.", Toast.LENGTH_SHORT).show();
-			else
-				Toast.makeText(LoginActivity.this, "Erreur : " + reponse , Toast.LENGTH_SHORT).show();
+			if(reussite.equals("false"))
+				Toast.makeText(LoginActivity.this,"Erreur : " + raison, Toast.LENGTH_LONG).show();
+			else if (reussite.equals("true")){
+				Toast.makeText(LoginActivity.this, "Connexion réussie.", Toast.LENGTH_SHORT).show();
+
+				Intent i = new Intent(LoginActivity.this, MainActivity.class);
+				i.putExtra("prenom", prenom);
+				i.putExtra("nom", nom);
+				i.putExtra("user_id", user_id);
+				LoginActivity.this.startActivity(i);
+				LoginActivity.this.finish();
+			}
 		}
 
 	}

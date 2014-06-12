@@ -165,8 +165,7 @@ public class SingleEvenementActivity  extends Activity {
 
                 @Override
                 public String getValue() {
-                    // TODO: token hardcodé, à récupérer dynamiquement à la connexion !
-                    return "3ef6d2274e3f53d761ef9626b8ca54c10cf191257f524810c8dfdbf620ee7b77170a1bb7226de060";
+                    return APIUtils.getLastToken();
                 }
 
                 @Override

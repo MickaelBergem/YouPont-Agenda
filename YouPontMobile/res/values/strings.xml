@@ -9,5 +9,6 @@
     <string name="hint_username">Nom d\'utilisateur</string>
     <string name="hint_password">Mot de passe</string>
     <string name="connection_btn">Connexion</string>
-
+    <string name="action_logout">Déconnexion</string>
+    
 </resources>

@@ -26,6 +26,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -46,37 +49,41 @@ public class MainActivity extends ListActivity {
 	String jsonStorage_FilePath = "jsonStorage_FilePath";
 
 	// JSON Node names
-    private static final String TAG_EVENEMENTS = "events";
-    private static final String TAG_REPONSES_USER = "reponses_perso";
-    private static final String TAG_EVENEMENTS_DATA = "evenements";
+	private static final String TAG_EVENEMENTS = "events";
+//	private static final String TAG_REPONSES_USER = "reponses_perso";
+	private static final String TAG_EVENEMENTS_DATA = "evenements";
 	private static final String TAG_ID = "id";
 	private static final String TAG_LABEL = "label";
 	private static final String TAG_DETAILS = "details";
 	private static final String TAG_DATE_DEB = "date_deb";
 	private static final String TAG_DATE_FIN = "date_fin";
 	private static final String TAG_LIEU = "lieu";
-	private static final String TAG_COULEUR = "couleur";
+//	private static final String TAG_COULEUR = "couleur";
 	private static final String TAG_NB_PARTICIPANTS = "nb_participants";
 
 	private ConnectionDetector cd;
 
 	// evenements JSONArray
-    JSONObject evenements_data = null;
-    JSONArray evenements = null;
-//     JSONObject reponses_user = null;
+	JSONObject evenements_data = null;
+	JSONArray evenements = null;
+	//     JSONObject reponses_user = null;
 
 	// Hashmap for ListView
 	ArrayList<HashMap<String, String>> evenementsList;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
+
+		if (!APIUtils.protectActivity(this)) return;
+
 		setContentView(R.layout.activity_main);
 
 		cd = new ConnectionDetector(this);
 
 		evenementsList = new ArrayList<HashMap<String, String>>();
-		
+
 		ListView lv = getListView();
 
 		// Listview on item click listener (for single event activity)
@@ -119,6 +126,28 @@ public class MainActivity extends ListActivity {
 		}
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu items for use in the action bar
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		// Handle action bar actions click
+		switch (item.getItemId()) {
+		case R.id.action_logout: 
+			APIUtils.logout(this); 
+			APIUtils.protectActivity(this);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
 	/*
 	 * Async task class to get json by making HTTP call
 	 * 
@@ -142,37 +171,36 @@ public class MainActivity extends ListActivity {
 			// Creating service handler class instance
 			ServiceHandler sh = new ServiceHandler();
 
-            NameValuePair getAllEventsVP = new NameValuePair() {
+			NameValuePair getAllEventsVP = new NameValuePair() {
 
-                @Override
-                public String getValue() {
-                    return "event_getall";
-                }
+				@Override
+				public String getValue() {
+					return "event_getall";
+				}
 
-                @Override
-                public String getName() {
-                    return "action";
-                }
-            };
-            
-            NameValuePair TokenVP = new NameValuePair() {
+				@Override
+				public String getName() {
+					return "action";
+				}
+			};
 
-                @Override
-                public String getValue() {
-                    // TODO: token hardcodé, à récupérer dynamiquement à la connexion !
-                    return "3ef6d2274e3f53d761ef9626b8ca54c10cf191257f524810c8dfdbf620ee7b77170a1bb7226de060";
-                }
+			NameValuePair TokenVP = new NameValuePair() {
 
-                @Override
-                public String getName() {
-                    return "token";
-                }
-            };
+				@Override
+				public String getValue() {
+					return APIUtils.getLastToken();
+				}
+
+				@Override
+				public String getName() {
+					return "token";
+				}
+			};
 
 			List<NameValuePair> listParams = new ArrayList<NameValuePair>();
-            listParams.add(getAllEventsVP);
-            listParams.add(TokenVP);
-            listParams.add(TokenVP);
+			listParams.add(getAllEventsVP);
+			listParams.add(TokenVP);
+			listParams.add(TokenVP);
 
 			// Making a request to url and getting response
 			String jsonString = sh.makeServiceCall(ServiceHandler.GET, listParams);
@@ -228,11 +256,11 @@ public class MainActivity extends ListActivity {
 					Log.d("Parsing evenements_data", "> " + TAG_EVENEMENTS_DATA);
 					// Getting JSON Array node
 					evenements_data = jsonObj.getJSONObject(TAG_EVENEMENTS_DATA);
-					
-                    Log.d("Parsing the events data...","evenements_data");
-                    evenements = ((JSONObject)evenements_data).getJSONArray(TAG_EVENEMENTS);
-//                     reponses_user = evenements_data.getJSONObject(TAG_REPONSES_USER);
-					
+
+					Log.d("Parsing the events data...","evenements_data");
+					evenements = ((JSONObject)evenements_data).getJSONArray(TAG_EVENEMENTS);
+					//                     reponses_user = evenements_data.getJSONObject(TAG_REPONSES_USER);
+
 					// Looping through all Evenements
 					for (int i = 0; i < evenements.length(); i++) {
 						// Get object "evenements"
@@ -244,7 +272,7 @@ public class MainActivity extends ListActivity {
 						String details = v.getString(TAG_DETAILS);
 						String nb_participants = v.getString(TAG_NB_PARTICIPANTS);
 						String lieu = v.getString(TAG_LIEU);
-// 						String couleur = v.getString(TAG_COULEUR);
+						// 						String couleur = v.getString(TAG_COULEUR);
 
 						/** Get and convert dates **/
 						// Get the date from Timestamp and convert to Date
@@ -270,7 +298,7 @@ public class MainActivity extends ListActivity {
 						evenement.put(TAG_ID, id);
 						evenement.put(TAG_LABEL, label);
 						evenement.put(TAG_DATE_DEB, date_deb);
-// 						evenement.put(TAG_COULEUR, couleur);
+						// 						evenement.put(TAG_COULEUR, couleur);
 						evenement.put(TAG_DATE_FIN, date_fin);
 						evenement.put(TAG_DETAILS, details);
 						evenement.put(TAG_NB_PARTICIPANTS, nb_participants);
