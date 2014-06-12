@@ -19,10 +19,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import youPont.mobile.R;
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,7 +39,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 public class MainActivity extends ListActivity {
@@ -50,7 +52,7 @@ public class MainActivity extends ListActivity {
 
 	// JSON Node names
 	private static final String TAG_EVENEMENTS = "events";
-//	private static final String TAG_REPONSES_USER = "reponses_perso";
+	private static final String TAG_REPONSES_USER = "reponses_perso";
 	private static final String TAG_EVENEMENTS_DATA = "evenements";
 	private static final String TAG_ID = "id";
 	private static final String TAG_LABEL = "label";
@@ -58,30 +60,31 @@ public class MainActivity extends ListActivity {
 	private static final String TAG_DATE_DEB = "date_deb";
 	private static final String TAG_DATE_FIN = "date_fin";
 	private static final String TAG_LIEU = "lieu";
-//	private static final String TAG_COULEUR = "couleur";
+	//	private static final String TAG_COULEUR = "couleur";
 	private static final String TAG_NB_PARTICIPANTS = "nb_participants";
 
-	private ConnectionDetector cd;
+	private static final int SINGLE_EVT_INTENT = 1; 
 
 	// evenements JSONArray
-	JSONObject evenements_data = null;
-	JSONArray evenements = null;
-	//     JSONObject reponses_user = null;
+	private JSONObject evenements_data = null;
+	private JSONObject evenements_reponses = null;	
+	private JSONArray evenements = null;
 
 	// Hashmap for ListView
-	ArrayList<HashMap<String, String>> evenementsList;
+	private List<HashMap<String, String>> evenementsListAll;
+	private List<HashMap<String, String>> evenementsList;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 
-		if (!APIUtils.protectActivity(this)) return;
+		if (!APIUtils.protectActivity(this)) return;// Checking if a token was stored in memory
 
 		setContentView(R.layout.activity_main);
 
-		cd = new ConnectionDetector(this);
-
+		evenementsListAll = new ArrayList<HashMap<String, String>>();
 		evenementsList = new ArrayList<HashMap<String, String>>();
 
 		ListView lv = getListView();
@@ -112,25 +115,47 @@ public class MainActivity extends ListActivity {
 				in.putExtra(TAG_LIEU, lieu);
 				in.putExtra(TAG_DETAILS, details);
 				in.putExtra(TAG_ID, idEvt);				
-				startActivity(in);
+				startActivityForResult(in, SINGLE_EVT_INTENT);
 
 			}
 		});
 
-		if(cd.isConnectingToInternet()){
-			// Calling async task to get json
-			new GetEvenements().execute();
-		} else {
-			// Internet connection is not present
-			Toast.makeText(MainActivity.this, "Pas de connexion Internet", Toast.LENGTH_SHORT).show();;
+		// Calling async task to get json
+		new GetEvenements().execute();
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// Check which request we're responding to
+		if (requestCode == SINGLE_EVT_INTENT) {
+			if(data!=null){
+				if(data.getBooleanExtra("modified", false))//if the user clicked on "Chaud!" or "Cacher" button, update eventsList
+					new GetEvenements().execute();// Calling async task to get json
+			}
 		}
+
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+
 		// Inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main, menu);
+
+		String showAll = "";
+
+		SharedPreferences settings = this.getSharedPreferences("ShowAll", 0);// get settings to check the "show all events" option
+
+		if (settings.contains("showAll"))
+			showAll = settings.getString("showAll", null);
+
+		//Initialize the checkbox according to settings
+		if(showAll.equals("false"))
+			menu.getItem(0).setChecked(false);
+		else
+			menu.getItem(0).setChecked(true);
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -139,10 +164,57 @@ public class MainActivity extends ListActivity {
 
 		// Handle action bar actions click
 		switch (item.getItemId()) {
-		case R.id.action_logout: 
-			APIUtils.logout(this); 
-			APIUtils.protectActivity(this);
+		case R.id.action_show_all:
+			ListAdapter adapter = null;
+
+			SharedPreferences settings = this.getSharedPreferences("ShowAll", 0);
+			SharedPreferences.Editor editor = settings.edit();
+			
+			//according to the settings, change the list of events (show all events or not)
+			if(item.isChecked()){
+				editor.putString("showAll", "false");
+				item.setChecked(false);
+				adapter = new SimpleAdapter(
+						MainActivity.this, evenementsList,
+						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
+								TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
+			}else{
+				editor.putString("showAll", "true");
+				item.setChecked(true);
+				adapter = new SimpleAdapter(
+						MainActivity.this, evenementsListAll,
+						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
+								TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
+			}
+			editor.commit();
+
+			setListAdapter(adapter);
+
 			return true;
+
+		case R.id.action_logout:
+			//show an alert dialog
+			new AlertDialog.Builder(this)
+			.setMessage("Voulez-vous vous déconnecter ?")
+			.setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					APIUtils.logout(MainActivity.this); //delete registered token from memory
+					APIUtils.protectActivity(MainActivity.this); //go back to LoginActivity
+				}
+			})
+			.setNegativeButton("Non", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				}
+			})
+			.show();
+
+			return true;
+			
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -257,9 +329,13 @@ public class MainActivity extends ListActivity {
 					// Getting JSON Array node
 					evenements_data = jsonObj.getJSONObject(TAG_EVENEMENTS_DATA);
 
+
 					Log.d("Parsing the events data...","evenements_data");
-					evenements = ((JSONObject)evenements_data).getJSONArray(TAG_EVENEMENTS);
-					//                     reponses_user = evenements_data.getJSONObject(TAG_REPONSES_USER);
+					evenements = evenements_data.getJSONArray(TAG_EVENEMENTS);
+					evenements_reponses = evenements_data.getJSONObject(TAG_REPONSES_USER);
+
+					evenementsList.clear();
+					evenementsListAll.clear();
 
 					// Looping through all Evenements
 					for (int i = 0; i < evenements.length(); i++) {
@@ -272,6 +348,7 @@ public class MainActivity extends ListActivity {
 						String details = v.getString(TAG_DETAILS);
 						String nb_participants = v.getString(TAG_NB_PARTICIPANTS);
 						String lieu = v.getString(TAG_LIEU);
+						String reponse = evenements_reponses.getString(id);
 						// 						String couleur = v.getString(TAG_COULEUR);
 
 						/** Get and convert dates **/
@@ -303,9 +380,12 @@ public class MainActivity extends ListActivity {
 						evenement.put(TAG_DETAILS, details);
 						evenement.put(TAG_NB_PARTICIPANTS, nb_participants);
 						evenement.put(TAG_LIEU, lieu);
+						evenement.put(TAG_REPONSES_USER, reponse);
 
 						// adding evenement to evenements list
-						evenementsList.add(evenement);
+						evenementsListAll.add(evenement);
+						if(!reponse.equals("rejet"))
+							evenementsList.add(evenement);
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -323,14 +403,31 @@ public class MainActivity extends ListActivity {
 			// Dismiss the progress dialog
 			if (pDialog.isShowing())
 				pDialog.dismiss();
+
+
 			/**
 			 * Updating parsed JSON data into ListView
 			 * */
-			ListAdapter adapter = new SimpleAdapter(
-					MainActivity.this, evenementsList,
-					R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
-							TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
-							R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
+			ListAdapter adapter = null;
+			String showAll = "";
+			SharedPreferences settings = MainActivity.this.getSharedPreferences("ShowAll", 0);
+			if (settings.contains("showAll")) {
+				showAll = settings.getString("showAll", null);
+			}
+			//according to the settings, show show all events or not
+			if(showAll.equals("false")){
+				adapter = new SimpleAdapter(
+						MainActivity.this, evenementsList,
+						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
+								TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
+			}else{
+				adapter = new SimpleAdapter(
+						MainActivity.this, evenementsListAll,
+						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
+								TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
+			}
 
 			setListAdapter(adapter);
 		}

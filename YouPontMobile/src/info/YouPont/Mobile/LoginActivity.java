@@ -18,15 +18,15 @@ import android.widget.Toast;
 
 public class LoginActivity extends Activity{
 	private ProgressDialog pDialog;
+	private ConnectionDetector cd;
 
+	// JSON node keys
 	private static final String TAG_REP = "reponse";
 	private static final String TAG_REUSSITE = "reussite";
 	private static final String TAG_PRENOM = "prenom";
 	private static final String TAG_NOM = "nom";
 	private static final String TAG_UID = "user_id";
 	private static final String TAG_RAISON = "raison";
-
-	private ConnectionDetector cd;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -37,7 +37,7 @@ public class LoginActivity extends Activity{
 
 		cd = new ConnectionDetector(this);
 
-		/* Bind the button to the proper event functions */
+		/* Bind the button to the proper event function */
 		((Button)findViewById(R.id.login_button)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -50,10 +50,10 @@ public class LoginActivity extends Activity{
 		String login = ((EditText)findViewById(R.id.login_edittext)).getText().toString();
 		String passwd = ((EditText)findViewById(R.id.password_edittext)).getText().toString();
 
-		if (login.equals("")){
+		if (login.equals("")){ //if the user did not enter a login
 			Toast.makeText(this, "Veuillez indiquer votre nom d'utilisateur.", Toast.LENGTH_LONG).show();
 			((EditText)findViewById(R.id.login_edittext)).requestFocus();
-		}else if (passwd.equals("")){
+		}else if (passwd.equals("")){ //if the user did not enter a password
 			Toast.makeText(this, "Veuillez indiquer votre mot de passe.", Toast.LENGTH_LONG).show();
 			((EditText)findViewById(R.id.password_edittext)).requestFocus();
 		}else {
@@ -63,7 +63,7 @@ public class LoginActivity extends Activity{
 
 			} else {
 				// Internet connection is not present
-				Toast.makeText(LoginActivity.this, "Pas de connexion Internet", Toast.LENGTH_SHORT).show();;
+				Toast.makeText(LoginActivity.this, "Pas de connexion Internet.", Toast.LENGTH_SHORT).show();;
 			}
 
 
@@ -108,7 +108,6 @@ public class LoginActivity extends Activity{
 
 					JSONObject reponse = v.getJSONObject(TAG_REP);
 
-
 					reussite = reponse.getString(TAG_REUSSITE);
 
 					if(reussite.equals("false"))
@@ -123,7 +122,7 @@ public class LoginActivity extends Activity{
 					e.printStackTrace();
 				}
 			} else {
-				// TODO : afficher un message d'erreur à l'écran
+				Toast.makeText(LoginActivity.this, "Echec de la requête.", Toast.LENGTH_SHORT).show();
 				Log.e("ServiceHandler", "Couldn't get any data from the url");
 			}
 
