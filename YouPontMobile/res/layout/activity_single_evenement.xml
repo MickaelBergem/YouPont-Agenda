@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="10dip"
             android:paddingTop="10dip"
-            android:textColor="#43bd00"
+            android:textColor="#002D80"
             android:textSize="25sp"
             android:textStyle="bold" />
 
@@ -50,7 +50,7 @@
             android:id="@+id/date_deb_label"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textColor="#acacac" />
+            android:textColor="#6B6B6B" />
 
         <!-- Lieu Label -->
 

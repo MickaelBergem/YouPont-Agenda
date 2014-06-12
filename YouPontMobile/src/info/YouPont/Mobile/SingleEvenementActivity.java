@@ -46,7 +46,7 @@ public class SingleEvenementActivity  extends Activity {
 	// participants list
 	private ArrayList<HashMap<String, String>> participantsList;
 
-
+	private Intent in = null;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,7 +55,7 @@ public class SingleEvenementActivity  extends Activity {
 		cd = new ConnectionDetector(this);
 
 		// getting intent data
-		Intent in = getIntent();
+		in = getIntent();
 
 		// Get JSON values from previous intent
 		final String label = in.getStringExtra(TAG_LABEL);
@@ -95,9 +95,9 @@ public class SingleEvenementActivity  extends Activity {
 			@Override
 			public void onClick(View v) {
 				if(cd.isConnectingToInternet()){
-					new ActionEvenement(id, "chaud").execute();
-					Intent i = getIntent();
-					i.putExtra("modified", true);
+					in.putExtra("info.YouPont.Mobile.modified", true);
+					setResult(RESULT_OK, in);
+					new ActionEvenement(id, "chaud").execute();	
 				} else {
 					// Internet connection is not present
 					Toast.makeText(SingleEvenementActivity.this, "Pas de connexion Internet.", Toast.LENGTH_SHORT).show();;
@@ -111,9 +111,9 @@ public class SingleEvenementActivity  extends Activity {
 			@Override
 			public void onClick(View v) {
 				if(cd.isConnectingToInternet()){
+					in.putExtra("info.YouPont.Mobile.modified", true);
+					setResult(RESULT_OK, in);
 					new ActionEvenement(id, "rejet").execute();
-					Intent i = getIntent();
-					i.putExtra("modified", true);
 				} else {
 					// Internet connection is not present
 					Toast.makeText(SingleEvenementActivity.this, "Pas de connexion Internet.", Toast.LENGTH_SHORT).show();;
@@ -373,9 +373,6 @@ public class SingleEvenementActivity  extends Activity {
 
 						// adding participant to participants list
 						participantsList.add(infosParticipant);
-						Log.d("Array", "length : " + participantsList.size());
-
-
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();

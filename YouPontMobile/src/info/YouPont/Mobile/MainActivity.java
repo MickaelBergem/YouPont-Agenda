@@ -129,7 +129,7 @@ public class MainActivity extends ListActivity {
 		// Check which request we're responding to
 		if (requestCode == SINGLE_EVT_INTENT) {
 			if(data!=null){
-				if(data.getBooleanExtra("modified", false))//if the user clicked on "Chaud!" or "Cacher" button, update eventsList
+				if(data.getBooleanExtra("info.YouPont.Mobile.modified", false))//if the user clicked on "Chaud!" or "Cacher" button, update eventsList
 					new GetEvenements().execute();// Calling async task to get json
 			}
 		}
