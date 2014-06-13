@@ -275,10 +275,10 @@ public class SingleEvenementActivity  extends Activity {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			// Showing progress dialog
-			pDialog = new ProgressDialog(SingleEvenementActivity.this);
-			pDialog.setMessage("Chargement...");
-			pDialog.setCancelable(false);
-			pDialog.show();
+//			pDialog = new ProgressDialog(SingleEvenementActivity.this);
+//			pDialog.setMessage("Chargement...");
+//			pDialog.setCancelable(false);
+//			pDialog.show();
 
 		}
 
@@ -389,8 +389,8 @@ public class SingleEvenementActivity  extends Activity {
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			// Dismiss the progress dialog
-			if (pDialog.isShowing())
-				pDialog.dismiss();
+//			if (pDialog.isShowing())
+//				pDialog.dismiss();
 			
 			/*
 			 * Updating the View showing the participants list
