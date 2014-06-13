@@ -1,4 +1,4 @@
-package info.YouPont.Mobile;
+package youPont.mobile;
 
 import org.json.JSONException;
 import org.json.JSONObject;

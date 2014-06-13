@@ -1,4 +1,4 @@
-package info.YouPont.Mobile;
+package youPont.mobile;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

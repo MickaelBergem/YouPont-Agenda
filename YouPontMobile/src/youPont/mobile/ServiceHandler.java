@@ -1,4 +1,4 @@
-package info.YouPont.Mobile;
+package youPont.mobile;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

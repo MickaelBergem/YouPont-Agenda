@@ -1,4 +1,4 @@
-package info.YouPont.Mobile;
+package youPont.mobile;
 
 /**** OFFLINE SYNCHRO ****/
 import java.io.BufferedReader;
@@ -120,8 +120,34 @@ public class MainActivity extends ListActivity {
 			}
 		});
 
-		// Calling async task to get json
-		new GetEvenements().execute();
+		if(((AppModel)getApplication()).isFirstTime()){
+			// Calling async task to get json
+			new GetEvenements().execute();
+			((AppModel)getApplication()).setFirstTime(false);
+		}else{
+			ListAdapter adapter = null;
+			String showAll = "";
+			SharedPreferences settings = MainActivity.this.getSharedPreferences("ShowAll", 0);
+			if (settings.contains("showAll")) {
+				showAll = settings.getString("showAll", null);
+			}
+			//according to the settings, show show all events or not
+			if(showAll.equals("false")){
+				adapter = new SimpleAdapter(
+						MainActivity.this, ((AppModel)getApplication()).getEvenementsList(),
+						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
+								TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
+			}else{
+				adapter = new SimpleAdapter(
+						MainActivity.this, ((AppModel)getApplication()).getEvenementsListAll(),
+						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
+								TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
+			}
+
+			setListAdapter(adapter);
+		}
 	}
 
 	@Override
@@ -169,13 +195,13 @@ public class MainActivity extends ListActivity {
 
 			SharedPreferences settings = this.getSharedPreferences("ShowAll", 0);
 			SharedPreferences.Editor editor = settings.edit();
-			
+
 			//according to the settings, change the list of events (show all events or not)
 			if(item.isChecked()){
 				editor.putString("showAll", "false");
 				item.setChecked(false);
 				adapter = new SimpleAdapter(
-						MainActivity.this, evenementsList,
+						MainActivity.this, ((AppModel)getApplication()).getEvenementsList(),
 						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
 								TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
 								R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
@@ -183,7 +209,7 @@ public class MainActivity extends ListActivity {
 				editor.putString("showAll", "true");
 				item.setChecked(true);
 				adapter = new SimpleAdapter(
-						MainActivity.this, evenementsListAll,
+						MainActivity.this, ((AppModel)getApplication()).getEvenementsListAll(),
 						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
 								TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
 								R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
@@ -214,7 +240,7 @@ public class MainActivity extends ListActivity {
 			.show();
 
 			return true;
-			
+
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -387,6 +413,10 @@ public class MainActivity extends ListActivity {
 						if(!reponse.equals("rejet"))
 							evenementsList.add(evenement);
 					}
+					
+					((AppModel)getApplication()).setEvenementsList(evenementsList);
+					((AppModel)getApplication()).setEvenementsListAll(evenementsListAll);
+					
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
