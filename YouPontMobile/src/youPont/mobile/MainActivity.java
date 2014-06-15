@@ -259,6 +259,12 @@ public class MainActivity extends ListActivity {
 			pDialog = new ProgressDialog(MainActivity.this);
 			pDialog.setMessage("Récupération des événements...");
 			pDialog.setCancelable(false);
+			pDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Annuler", new DialogInterface.OnClickListener() {
+			    @Override
+			    public void onClick(DialogInterface dialog, int which) {
+			        dialog.dismiss();
+			    }
+			});
 			pDialog.show();
 
 		}
