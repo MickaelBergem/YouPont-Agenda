@@ -4,9 +4,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import youPont.mobile.R;
+import youPont.mobile.api.APIUtils;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -141,6 +143,17 @@ public class LoginActivity extends Activity{
 			else if (reussite.equals("true")){
 				Toast.makeText(LoginActivity.this, "Connexion réussie.", Toast.LENGTH_SHORT).show();
 
+				/*
+				 * Update preferences with prenom and nom of the user
+				 */
+				SharedPreferences settings = LoginActivity.this.getSharedPreferences("APIAuth", 0);
+				SharedPreferences.Editor editor = settings.edit();
+				
+				editor.putString("prenom", prenom);
+				editor.putString("nom", nom);
+				
+				editor.commit();
+				
 				Intent i = new Intent(LoginActivity.this, MainActivity.class);
 				i.putExtra("prenom", prenom);
 				i.putExtra("nom", nom);

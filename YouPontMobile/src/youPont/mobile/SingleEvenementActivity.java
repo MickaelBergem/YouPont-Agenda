@@ -9,6 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import youPont.mobile.api.APIUtils;
+import youPont.mobile.api.ServiceHandler;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -101,10 +103,7 @@ public class SingleEvenementActivity  extends Activity {
 				if(cd.isConnectingToInternet()){
 					in.putExtra("info.YouPont.Mobile.modified", true);
 					setResult(RESULT_OK, in);
-					new ActionEvenement(SingleEvenementActivity.this, id, "chaud").execute();	
-					TextView lblReponse = (TextView) findViewById(R.id.reponse_label);
-					lblReponse.setText("Vous êtes inscrit.");
-
+					new ActionEvenement(SingleEvenementActivity.this, 1, id, "chaud").execute();	
 				} else {
 					// Internet connection is not present
 					Toast.makeText(SingleEvenementActivity.this, "Pas de connexion Internet.", Toast.LENGTH_SHORT).show();;
@@ -120,9 +119,7 @@ public class SingleEvenementActivity  extends Activity {
 				if(cd.isConnectingToInternet()){
 					in.putExtra("info.YouPont.Mobile.modified", true);
 					setResult(RESULT_OK, in);
-					new ActionEvenement(SingleEvenementActivity.this, id, "rejet").execute();
-					TextView lblReponse = (TextView) findViewById(R.id.reponse_label);
-					lblReponse.setText("Vous n'êtes pas inscrit.");
+					new ActionEvenement(SingleEvenementActivity.this, 1, id, "rejet").execute();
 				} else {
 					// Internet connection is not present
 					Toast.makeText(SingleEvenementActivity.this, "Pas de connexion Internet.", Toast.LENGTH_SHORT).show();;
@@ -145,17 +142,6 @@ public class SingleEvenementActivity  extends Activity {
 
 		public GetChauds(String eventID){
 			this.eventID = eventID;
-		}
-
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			// Showing progress dialog
-//			pDialog = new ProgressDialog(SingleEvenementActivity.this);
-//			pDialog.setMessage("Chargement...");
-//			pDialog.setCancelable(false);
-//			pDialog.show();
-
 		}
 
 		// Get JSON data
@@ -264,9 +250,6 @@ public class SingleEvenementActivity  extends Activity {
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			// Dismiss the progress dialog
-//			if (pDialog.isShowing())
-//				pDialog.dismiss();
 			
 			/*
 			 * Updating the View showing the participants list

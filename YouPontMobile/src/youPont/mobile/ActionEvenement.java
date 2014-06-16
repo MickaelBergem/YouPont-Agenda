@@ -7,10 +7,14 @@ import org.apache.http.NameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.ProgressDialog;
+import youPont.mobile.api.APIUtils;
+import youPont.mobile.api.ServiceHandler;
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /*
@@ -18,32 +22,25 @@ import android.widget.Toast;
  * 
  */
 public class ActionEvenement extends AsyncTask<Void, Void, Void> {
-	
-	private ProgressDialog pDialog;
+
 
 	private String eventID, reponseType;
 	private String code_erreur, reponse;
-	
+
+	private int contextId = 0;
 	private Context context;
-	
+
 	private static final String TAG_ERR_CODE = "code_erreur";
 	private static final String TAG_REP = "reponse";
+	private static final int ID_MAIN = 0;
+	private static final int ID_SINGLE = 1;
 
-	public ActionEvenement(Context context, String eventID, String reponseType){
+
+	public ActionEvenement(Context context, int contextId, String eventID, String reponseType){
 		this.context = context;
+		this.contextId = contextId;
 		this.eventID = eventID;
 		this.reponseType = reponseType;
-	}
-
-	@Override
-	protected void onPreExecute() {
-		super.onPreExecute();
-		// Showing progress dialog
-		pDialog = new ProgressDialog(context);
-		pDialog.setMessage("Chargement...");
-		pDialog.setCancelable(false);
-		pDialog.show();
-
 	}
 
 	// Get JSON data
@@ -135,18 +132,34 @@ public class ActionEvenement extends AsyncTask<Void, Void, Void> {
 	@Override
 	protected void onPostExecute(Void result) {
 		super.onPostExecute(result);
-		// Dismiss the progress dialog
-		
-		if (pDialog.isShowing())
-			pDialog.dismiss();
 
 		if(Integer.parseInt(code_erreur) == 0){//if the request was not wrong
 			String msg = "";
 			if(reponseType.equals("rejet")){//if the action was "Cacher"
 				msg = "Evénement retiré.";
-				//mActivity.finish();//destroy the activity to return to events list
-			}else
+				
+				if(contextId == ID_SINGLE){//if the request was called from SingleEvenementActivity
+					((Activity)context).finish();
+					
+				}else if (contextId == ID_MAIN)//if the request was called from MainActivity
+					((MainActivity)context).getEventsTask();//update the events list
+				
+			}else{
 				msg = "Inscription enregistrée.";
+				
+				if(contextId == ID_SINGLE){//if the request was called from SingleEvenementActivit
+					TextView lblReponse = (TextView) ((Activity)context).findViewById(R.id.reponse_label);
+					lblReponse.setText("Vous êtes inscrit.");
+					
+					SharedPreferences settings = context.getSharedPreferences("APIAuth", 0);
+
+					TextView lblParticipants = (TextView) ((Activity)context).findViewById(R.id.participants_label);
+					lblParticipants.setText(lblParticipants.getText().toString() +
+							"- " + settings.getString("prenom", null) + " " + settings.getString("nom", null));
+					
+				} else if (contextId == ID_MAIN)//if the request was called from MainActivity
+					((MainActivity)context).getEventsTask();//update the events list
+			}
 
 			Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
 		}

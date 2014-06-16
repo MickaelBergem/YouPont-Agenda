@@ -7,6 +7,10 @@ import android.app.Application;
 
 public class AppModel extends Application{
 	
+	private boolean firstTime = true; //to know if the MainActivity is created for the first time since the opening of the app
+	private List<HashMap<String, String>> evenementsListAll;
+	private List<HashMap<String, String>> evenementsList;
+	
 	public AppModel(){
 		super();
 	}
@@ -35,7 +39,4 @@ public class AppModel extends Application{
 		this.evenementsList = evenementsList;
 	}
 
-	private boolean firstTime = true;
-	private List<HashMap<String, String>> evenementsListAll;
-	private List<HashMap<String, String>> evenementsList;
 }

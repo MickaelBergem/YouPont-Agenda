@@ -18,6 +18,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import youPont.mobile.api.APIUtils;
+import youPont.mobile.api.ServiceHandler;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -247,6 +249,13 @@ public class MainActivity extends ListActivity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
+	
+	/**
+	 * Triggers the Get Evenements request
+	 */
+	public void getEventsTask(){
+		new GetEvenements().execute();
+	}
 
 	/*
 	 * Async task class to get json by making HTTP call
@@ -452,7 +461,7 @@ public class MainActivity extends ListActivity {
 			if (settings.contains("showAll")) {
 				showAll = settings.getString("showAll", null);
 			}
-			//according to the settings, show show all events or not
+			//according to the settings, show all events or not
 			if(showAll.equals("false")){
 				adapter = new EventListAdapter(
 						MainActivity.this, evenementsList,
