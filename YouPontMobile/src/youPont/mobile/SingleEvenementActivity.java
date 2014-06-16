@@ -9,21 +9,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import youPont.mobile.R;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class SingleEvenementActivity  extends Activity {
 
-	private ProgressDialog pDialog;
 	private ConnectionDetector cd;
 
 	// JSON node keys
@@ -32,7 +29,6 @@ public class SingleEvenementActivity  extends Activity {
 	private static final String TAG_LIEU = "lieu";
 	private static final String TAG_DETAILS = "details";	
 	private static final String TAG_ID = "id";
-	private static final String TAG_ERR_CODE = "code_erreur";
 	private static final String TAG_REP = "reponse";
 	private static final String TAG_NB_PART = "nb_participants";
 	private static final String TAG_LISTE = "liste";
@@ -42,6 +38,7 @@ public class SingleEvenementActivity  extends Activity {
 	private static final String TAG_PROMO = "promo";
 	private static final String TAG_DPT = "departement";
 	private static final String TAG_TEL = "telephone";
+	private static final String TAG_REPONSES_USER = "reponses_perso";
 
 	// participants list
 	private ArrayList<HashMap<String, String>> participantsList;
@@ -63,6 +60,7 @@ public class SingleEvenementActivity  extends Activity {
 		final String lieu = in.getStringExtra(TAG_LIEU);
 		final String details = in.getStringExtra(TAG_DETAILS);
 		final String id = in.getStringExtra(TAG_ID);
+		final String reponsePerso = in.getStringExtra(TAG_REPONSES_USER);
 
 		// Displaying all values on the screen
 		TextView lblLabel = (TextView) findViewById(R.id.label_label);
@@ -70,13 +68,19 @@ public class SingleEvenementActivity  extends Activity {
 		TextView lblLieu = (TextView) findViewById(R.id.lieu_label);
 		TextView lblDetails = (TextView) findViewById(R.id.details_label);
 		TextView lblId = (TextView) findViewById(R.id.id_label);
+		TextView lblReponse = (TextView) findViewById(R.id.reponse_label);
 
 		lblLabel.setText(label);
 		lblDate_deb.setText(date_deb);
 		lblLieu.setText(lieu);
 		lblDetails.setText(details);
 		lblId.setText(id);
-
+		if(reponsePerso.equals("chaud")){
+			lblReponse.setText("Vous êtes inscrit.");
+		} else {
+			lblReponse.setText("Vous n'êtes pas inscrit.");
+		}
+		
 		//initialize participants list
 		participantsList = new ArrayList<HashMap<String, String>>();
 
@@ -87,9 +91,9 @@ public class SingleEvenementActivity  extends Activity {
 			Toast.makeText(this, "Impossible de récupérer la liste des participants. Vérifier votre connexion Internet.", Toast.LENGTH_SHORT).show();;
 		}
 		//view buttons
-		Button chaudBtn = (Button)findViewById(R.id.chaud_btn);
-		Button cacherBtn = (Button)findViewById(R.id.cacher_btn);
-
+		final ImageButton chaudBtn = (ImageButton)findViewById(R.id.chaud_btn);
+		final ImageButton cacherBtn = (ImageButton)findViewById(R.id.cacher_btn);
+		
 		chaudBtn.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -97,7 +101,10 @@ public class SingleEvenementActivity  extends Activity {
 				if(cd.isConnectingToInternet()){
 					in.putExtra("info.YouPont.Mobile.modified", true);
 					setResult(RESULT_OK, in);
-					new ActionEvenement(id, "chaud").execute();	
+					new ActionEvenement(SingleEvenementActivity.this, id, "chaud").execute();	
+					TextView lblReponse = (TextView) findViewById(R.id.reponse_label);
+					lblReponse.setText("Vous êtes inscrit.");
+
 				} else {
 					// Internet connection is not present
 					Toast.makeText(SingleEvenementActivity.this, "Pas de connexion Internet.", Toast.LENGTH_SHORT).show();;
@@ -113,7 +120,9 @@ public class SingleEvenementActivity  extends Activity {
 				if(cd.isConnectingToInternet()){
 					in.putExtra("info.YouPont.Mobile.modified", true);
 					setResult(RESULT_OK, in);
-					new ActionEvenement(id, "rejet").execute();
+					new ActionEvenement(SingleEvenementActivity.this, id, "rejet").execute();
+					TextView lblReponse = (TextView) findViewById(R.id.reponse_label);
+					lblReponse.setText("Vous n'êtes pas inscrit.");
 				} else {
 					// Internet connection is not present
 					Toast.makeText(SingleEvenementActivity.this, "Pas de connexion Internet.", Toast.LENGTH_SHORT).show();;
@@ -122,140 +131,7 @@ public class SingleEvenementActivity  extends Activity {
 		});
 	}
 
-	/*
-	 * Async task class to get json by making HTTP call
-	 * 
-	 */
-	private class ActionEvenement extends AsyncTask<Void, Void, Void> {
-
-		private String eventID, reponseType;
-		private String code_erreur, reponse;
-
-		public ActionEvenement(String eventID, String reponseType){
-			this.eventID = eventID;
-			this.reponseType = reponseType;
-		}
-
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			// Showing progress dialog
-			pDialog = new ProgressDialog(SingleEvenementActivity.this);
-			pDialog.setMessage("Chargement...");
-			pDialog.setCancelable(false);
-			pDialog.show();
-
-		}
-
-		// Get JSON data
-		@Override
-		protected Void doInBackground(Void... arg0) {
-			// Creating service handler class instance
-			ServiceHandler sh = new ServiceHandler();
-
-			/*
-			 * Creating value pairs, parameters for the HTTP request
-			 */
-
-			NameValuePair eventReponseVP = new NameValuePair() {
-				@Override
-				public String getValue() {
-					return "event_reponse";
-				}
-				@Override
-				public String getName() {
-					return "action";
-				}
-			};
-
-			NameValuePair eventIdVP = new NameValuePair() {
-				@Override
-				public String getValue() {
-					return eventID;
-				}
-				@Override
-				public String getName() {
-					return "id";
-				}
-			};
-
-			NameValuePair reponseVP = new NameValuePair() {
-				@Override
-				public String getValue() {
-					return reponseType;
-				}
-				@Override
-				public String getName() {
-					return "reponse";
-				}
-			};
-
-			NameValuePair TokenVP = new NameValuePair() {
-
-				@Override
-				public String getValue() {
-					return APIUtils.getLastToken();
-				}
-
-				@Override
-				public String getName() {
-					return "token";
-				}
-			};
-
-			List<NameValuePair> listParams = new ArrayList<NameValuePair>();
-			listParams.add(eventReponseVP);
-			listParams.add(eventIdVP);
-			listParams.add(reponseVP);
-			listParams.add(TokenVP);
-
-			// Making a request to url and getting response
-			String jsonString = sh.makeServiceCall(ServiceHandler.GET, listParams);
-			Log.d("jsonString_value(reponse): ", "> " + jsonString);
-
-			if (jsonString != null) {
-				try {
-					JSONObject v = new JSONObject(jsonString);
-
-
-					// Get all items for the event
-					code_erreur = v.getString(TAG_ERR_CODE);
-					reponse = v.getString(TAG_REP);
-
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			} else {
-				Toast.makeText(SingleEvenementActivity.this, "Echec de la requête.", Toast.LENGTH_SHORT).show();
-				Log.e("ServiceHandler", "Couldn't get any data from the url");
-			}
-
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			// Dismiss the progress dialog
-			if (pDialog.isShowing())
-				pDialog.dismiss();
-
-			if(Integer.parseInt(code_erreur) == 0){//if the request was not wrong
-				String msg = "";
-				if(reponseType.equals("rejet")){//if the action was "Cacher"
-					msg = "Evénement retiré.";
-					SingleEvenementActivity.this.finish();//destroy the activity to return to events list
-				}else
-					msg = "Inscription enregistrée.";
-
-				Toast.makeText(SingleEvenementActivity.this, msg, Toast.LENGTH_SHORT).show();
-			}
-			else
-				Toast.makeText(SingleEvenementActivity.this, "Erreur : " + reponse , Toast.LENGTH_SHORT).show();
-		}
-
-	}
-
+	
 	/*
 	 * Async task class to get json by making HTTP call
 	 * 

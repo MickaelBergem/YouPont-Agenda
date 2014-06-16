@@ -18,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import youPont.mobile.R;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -37,7 +36,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 
@@ -73,6 +71,7 @@ public class MainActivity extends ListActivity {
 	// Hashmap for ListView
 	private List<HashMap<String, String>> evenementsListAll;
 	private List<HashMap<String, String>> evenementsList;
+	
 
 
 	@Override
@@ -88,7 +87,7 @@ public class MainActivity extends ListActivity {
 		evenementsList = new ArrayList<HashMap<String, String>>();
 
 		ListView lv = getListView();
-
+		
 		// Listview on item click listener (for single event activity)
 		lv.setOnItemClickListener(new OnItemClickListener() {
 
@@ -106,6 +105,8 @@ public class MainActivity extends ListActivity {
 						.getText().toString();
 				String idEvt = ((TextView) view.findViewById(R.id.id))
 						.getText().toString();
+				String reponse_perso = ((TextView) view.findViewById(R.id.reponse_perso))
+						.getText().toString();
 
 				// Starting single event activity
 				Intent in = new Intent(getApplicationContext(),
@@ -114,7 +115,8 @@ public class MainActivity extends ListActivity {
 				in.putExtra(TAG_DATE_DEB, date_deb);
 				in.putExtra(TAG_LIEU, lieu);
 				in.putExtra(TAG_DETAILS, details);
-				in.putExtra(TAG_ID, idEvt);				
+				in.putExtra(TAG_ID, idEvt);		
+				in.putExtra(TAG_REPONSES_USER, reponse_perso);
 				startActivityForResult(in, SINGLE_EVT_INTENT);
 
 			}
@@ -133,17 +135,17 @@ public class MainActivity extends ListActivity {
 			}
 			//according to the settings, show show all events or not
 			if(showAll.equals("false")){
-				adapter = new SimpleAdapter(
+				adapter = new EventListAdapter(
 						MainActivity.this, ((AppModel)getApplication()).getEvenementsList(),
 						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
-								TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
-								R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
+								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso });
 			}else{
-				adapter = new SimpleAdapter(
+				adapter = new EventListAdapter(
 						MainActivity.this, ((AppModel)getApplication()).getEvenementsListAll(),
 						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
-								TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
-								R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
+								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso });
 			}
 
 			setListAdapter(adapter);
@@ -200,19 +202,19 @@ public class MainActivity extends ListActivity {
 			if(item.isChecked()){
 				editor.putString("showAll", "false");
 				item.setChecked(false);
-				adapter = new SimpleAdapter(
+				adapter = new EventListAdapter(
 						MainActivity.this, ((AppModel)getApplication()).getEvenementsList(),
 						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
-								TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
-								R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
+								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso });
 			}else{
 				editor.putString("showAll", "true");
 				item.setChecked(true);
-				adapter = new SimpleAdapter(
+				adapter = new EventListAdapter(
 						MainActivity.this, ((AppModel)getApplication()).getEvenementsListAll(),
 						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
-								TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
-								R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
+								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso });
 			}
 			editor.commit();
 
@@ -452,17 +454,17 @@ public class MainActivity extends ListActivity {
 			}
 			//according to the settings, show show all events or not
 			if(showAll.equals("false")){
-				adapter = new SimpleAdapter(
+				adapter = new EventListAdapter(
 						MainActivity.this, evenementsList,
 						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
-								TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
-								R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
+								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso });
 			}else{
-				adapter = new SimpleAdapter(
+				adapter = new EventListAdapter(
 						MainActivity.this, evenementsListAll,
 						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
-								TAG_LIEU, TAG_DETAILS, TAG_ID }, new int[] { R.id.label,
-								R.id.date_deb, R.id.lieu, R.id.details, R.id.id });
+								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER  }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso });
 			}
 
 			setListAdapter(adapter);

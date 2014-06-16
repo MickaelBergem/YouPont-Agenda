@@ -2,60 +2,107 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="horizontal"
     android:padding="10dp"
     android:paddingLeft="10dp"
     android:paddingRight="10dp" >
 
-    <!-- Label Label -->
-
-    <TextView
-        android:id="@+id/label"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="2dip"
-        android:paddingTop="6dip"
-        android:textColor="#002D80"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
-    <!-- Date_Deb label -->
-
-    <TextView
-        android:id="@+id/date_deb"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="2dip"
-        android:textColor="#6B6B6B" />
-
-    <!-- Lieu label -->
-
-    <TextView
-        android:id="@+id/lieu"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="left"
-        android:textColor="#5d5d5d"
-        android:textStyle="bold" />
+        android:orientation="vertical" >
 
-    <!-- Details label -->
+        <!-- Label Label -->
 
-    <TextView
-        android:id="@+id/details"
+        <TextView
+            android:id="@+id/label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dip"
+            android:paddingTop="6dip"
+            android:textColor="#002D80"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- Date_Deb label -->
+
+        <TextView
+            android:id="@+id/date_deb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dip"
+            android:textColor="#6B6B6B" />
+
+        <!-- Lieu label -->
+
+        <TextView
+            android:id="@+id/lieu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:textColor="#5d5d5d"
+            android:textStyle="bold" />
+
+        <!-- Details label -->
+
+        <TextView
+            android:id="@+id/details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:textColor="#FFFFFF"
+            android:visibility="gone" />
+
+        <!-- ID label -->
+
+        <TextView
+            android:id="@+id/id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:textColor="#FFFFFF"
+            android:visibility="gone" />
+        
+        <!-- reponse label -->
+
+        <TextView
+            android:id="@+id/reponse_perso"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:textColor="#FFFFFF"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="0dip"
+        android:layout_height="1dp"
+        android:layout_weight="1" >
+    </View>
+
+    <ImageButton
+        android:id="@+id/chaud_btn"
+        style="@style/ButtonC"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="left"
-        android:textColor="#FFFFFF"
-        android:visibility="gone" />
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="2dip"
+        android:background="@drawable/nice_button_green"
+        android:contentDescription="@string/chaud_text"
+        android:padding="10dip"
+        android:src="@drawable/checkmark16" />
 
-    <!-- ID label -->
-
-    <TextView
-        android:id="@+id/id"
+    <ImageButton
+        android:id="@+id/cacher_btn"
+        style="@style/ButtonC"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="left"
-        android:textColor="#FFFFFF"
-        android:visibility="gone" />
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="2dip"
+        android:background="@drawable/nice_button_red"
+        android:contentDescription="@string/chaud_text"
+        android:padding="10dip"
+        android:src="@drawable/trash16" />
 
 </LinearLayout>

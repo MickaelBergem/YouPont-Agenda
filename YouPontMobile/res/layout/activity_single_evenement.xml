@@ -14,22 +14,36 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:orientation="horizontal" >
+            
+            <TextView
+            android:id="@+id/reponse_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="5dp"
+            android:textStyle="italic" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/chaud_btn"
+                style="@style/ButtonC"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="2dip"
-                android:paddingTop="6dip"
-                android:text="@string/chaud_text" />
+                android:layout_marginRight="2dip"
+                android:background="@drawable/nice_button_green"
+                android:padding="14dip"
+                android:src="@drawable/checkmark24"
+                android:contentDescription="@string/chaud_text" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/cacher_btn"
+                style="@style/ButtonC"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="2dip"
-                android:paddingTop="6dip"
-                android:text="@string/cacher_text" />
+                android:layout_marginLeft="2dip"
+                android:background="@drawable/nice_button_red"
+                android:padding="14dip"
+                android:src="@drawable/trash24"
+                android:contentDescription="@string/chaud_text" />
         </LinearLayout>
 
         <!-- Label Label -->
@@ -75,16 +89,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone" />
-        
+
         <!-- Details Label -->
 
         <TextView
-            android:paddingTop="6dip"
             android:id="@+id/participants_label"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="6dip"
             android:visibility="visible" />
-        
     </LinearLayout>
 
 </ScrollView>
