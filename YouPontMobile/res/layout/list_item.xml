@@ -43,6 +43,16 @@
             android:gravity="left"
             android:textColor="#5d5d5d"
             android:textStyle="bold" />
+        
+        <!-- Participants label -->
+
+        <TextView
+            android:id="@+id/participants"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:textColor="#444444"
+            android:textStyle="italic" />
 
         <!-- Details label -->
 

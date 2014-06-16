@@ -140,14 +140,14 @@ public class MainActivity extends ListActivity {
 				adapter = new EventListAdapter(
 						MainActivity.this, ((AppModel)getApplication()).getEvenementsList(),
 						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
-								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER }, new int[] { R.id.label,
-								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso });
+								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER, TAG_NB_PARTICIPANTS }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso, R.id.participants });
 			}else{
 				adapter = new EventListAdapter(
 						MainActivity.this, ((AppModel)getApplication()).getEvenementsListAll(),
 						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
-								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER }, new int[] { R.id.label,
-								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso });
+								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER, TAG_NB_PARTICIPANTS }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso, R.id.participants });
 			}
 
 			setListAdapter(adapter);
@@ -207,16 +207,16 @@ public class MainActivity extends ListActivity {
 				adapter = new EventListAdapter(
 						MainActivity.this, ((AppModel)getApplication()).getEvenementsList(),
 						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
-								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER }, new int[] { R.id.label,
-								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso });
+								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER, TAG_NB_PARTICIPANTS }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso, R.id.participants });
 			}else{
 				editor.putString("showAll", "true");
 				item.setChecked(true);
 				adapter = new EventListAdapter(
 						MainActivity.this, ((AppModel)getApplication()).getEvenementsListAll(),
 						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
-								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER }, new int[] { R.id.label,
-								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso });
+								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER, TAG_NB_PARTICIPANTS }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso, R.id.participants });
 			}
 			editor.commit();
 
@@ -421,7 +421,7 @@ public class MainActivity extends ListActivity {
 						// 						evenement.put(TAG_COULEUR, couleur);
 						evenement.put(TAG_DATE_FIN, date_fin);
 						evenement.put(TAG_DETAILS, details);
-						evenement.put(TAG_NB_PARTICIPANTS, nb_participants);
+						evenement.put(TAG_NB_PARTICIPANTS, nb_participants + " participants");
 						evenement.put(TAG_LIEU, lieu);
 						evenement.put(TAG_REPONSES_USER, reponse);
 
@@ -466,14 +466,14 @@ public class MainActivity extends ListActivity {
 				adapter = new EventListAdapter(
 						MainActivity.this, evenementsList,
 						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
-								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER }, new int[] { R.id.label,
-								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso });
+								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER, TAG_NB_PARTICIPANTS }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso, R.id.participants });
 			}else{
 				adapter = new EventListAdapter(
 						MainActivity.this, evenementsListAll,
 						R.layout.list_item, new String[] { TAG_LABEL, TAG_DATE_DEB,
-								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER  }, new int[] { R.id.label,
-								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso });
+								TAG_LIEU, TAG_DETAILS, TAG_ID, TAG_REPONSES_USER, TAG_NB_PARTICIPANTS  }, new int[] { R.id.label,
+								R.id.date_deb, R.id.lieu, R.id.details, R.id.id, R.id.reponse_perso, R.id.participants });
 			}
 
 			setListAdapter(adapter);
