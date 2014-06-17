@@ -1,6 +1,7 @@
 package youPont.mobile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -32,6 +33,8 @@ public class ActionEvenement extends AsyncTask<Void, Void, Void> {
 
 	private static final String TAG_ERR_CODE = "code_erreur";
 	private static final String TAG_REP = "reponse";
+	private static final String TAG_PRENOM = "prenom";
+	private static final String TAG_NOM = "nom";
 	private static final int ID_MAIN = 0;
 	private static final int ID_SINGLE = 1;
 
@@ -147,15 +150,24 @@ public class ActionEvenement extends AsyncTask<Void, Void, Void> {
 			}else{
 				msg = "Inscription enregistrée.";
 				
-				if(contextId == ID_SINGLE){//if the request was called from SingleEvenementActivit
+				if(contextId == ID_SINGLE){//if the request was called from SingleEvenementActivity
 					TextView lblReponse = (TextView) ((Activity)context).findViewById(R.id.reponse_label);
 					lblReponse.setText("Vous êtes inscrit.");
 					
 					SharedPreferences settings = context.getSharedPreferences("APIAuth", 0);
 
+					
+					
 					TextView lblParticipants = (TextView) ((Activity)context).findViewById(R.id.participants_label);
-					lblParticipants.setText(lblParticipants.getText().toString() +
-							"- " + settings.getString("prenom", null) + " " + settings.getString("nom", null));
+					
+					String participantsText = (((SingleEvenementActivity)context).getNb_participants()+1) + " participants. \n";
+					for(HashMap<String, String> hm : ((SingleEvenementActivity)context).getParticipantsList()){
+						String prenom = hm.get(TAG_PRENOM);
+						String nom = hm.get(TAG_NOM);
+						participantsText += "- " + prenom + " " + nom + "\n";
+					}
+					participantsText += "- " + settings.getString("prenom", null) + " " + settings.getString("nom", null) + "\n";
+					lblParticipants.setText(participantsText);
 					
 				} else if (contextId == ID_MAIN)//if the request was called from MainActivity
 					((MainActivity)context).getEventsTask();//update the events list

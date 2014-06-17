@@ -44,8 +44,25 @@ public class SingleEvenementActivity  extends Activity {
 
 	// participants list
 	private ArrayList<HashMap<String, String>> participantsList;
+	private int nb_participants;
 
 	private Intent in = null;
+
+	public int getNb_participants() {
+		return nb_participants;
+	}
+
+
+	public void setNb_participants(int nb_participants) {
+		this.nb_participants = nb_participants;
+	}
+
+
+	public ArrayList<HashMap<String, String>> getParticipantsList() {
+		return participantsList;
+	}
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -82,7 +99,7 @@ public class SingleEvenementActivity  extends Activity {
 		} else {
 			lblReponse.setText("Vous n'êtes pas inscrit.");
 		}
-		
+
 		//initialize participants list
 		participantsList = new ArrayList<HashMap<String, String>>();
 
@@ -95,20 +112,24 @@ public class SingleEvenementActivity  extends Activity {
 		//view buttons
 		final ImageButton chaudBtn = (ImageButton)findViewById(R.id.chaud_btn);
 		final ImageButton cacherBtn = (ImageButton)findViewById(R.id.cacher_btn);
-		
+
 		chaudBtn.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				if(cd.isConnectingToInternet()){
-					in.putExtra("info.YouPont.Mobile.modified", true);
-					setResult(RESULT_OK, in);
-					new ActionEvenement(SingleEvenementActivity.this, 1, id, "chaud").execute();	
-				} else {
-					// Internet connection is not present
-					Toast.makeText(SingleEvenementActivity.this, "Pas de connexion Internet.", Toast.LENGTH_SHORT).show();;
-				}
+				if(!reponsePerso.equals("chaud")){ // if the user has not already subscribed
+					if(cd.isConnectingToInternet()){
+						in.putExtra("info.YouPont.Mobile.modified", true);
+						setResult(RESULT_OK, in);
+						new ActionEvenement(SingleEvenementActivity.this, 1, id, "chaud").execute();	
+					} else {
+						// Internet connection is not present
+						Toast.makeText(SingleEvenementActivity.this, "Pas de connexion Internet.", Toast.LENGTH_SHORT).show();;
+					}
 
+				} else{
+					Toast.makeText(SingleEvenementActivity.this, "Vous êtes déjà inscrit.", Toast.LENGTH_SHORT).show();;
+				}
 			}
 		});
 
@@ -128,7 +149,7 @@ public class SingleEvenementActivity  extends Activity {
 		});
 	}
 
-	
+
 	/*
 	 * Async task class to get json by making HTTP call
 	 * 
@@ -136,7 +157,6 @@ public class SingleEvenementActivity  extends Activity {
 	private class GetChauds extends AsyncTask<Void, Void, Void> {
 
 		private String eventID;
-		private int nb_participants;
 
 		private JSONArray participants = null;
 
@@ -200,7 +220,7 @@ public class SingleEvenementActivity  extends Activity {
 
 			if (jsonString != null) {
 				try {
-					
+
 					JSONObject v = new JSONObject(jsonString);
 					JSONObject reponse = v.getJSONObject(TAG_REP);
 
@@ -250,11 +270,11 @@ public class SingleEvenementActivity  extends Activity {
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			
+
 			/*
 			 * Updating the View showing the participants list
 			 */
-			
+
 			TextView participants = (TextView)findViewById(R.id.participants_label);
 
 			String participantsText = nb_participants + " participants. \n";

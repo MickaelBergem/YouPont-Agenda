@@ -182,9 +182,9 @@ public class MainActivity extends ListActivity {
 
 		//Initialize the checkbox according to settings
 		if(showAll.equals("false"))
-			menu.getItem(0).setChecked(false);
+			menu.getItem(1).setChecked(false);
 		else
-			menu.getItem(0).setChecked(true);
+			menu.getItem(1).setChecked(true);
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -194,6 +194,9 @@ public class MainActivity extends ListActivity {
 
 		// Handle action bar actions click
 		switch (item.getItemId()) {
+		case R.id.action_refresh:
+			new GetEvenements().execute();
+			return true;
 		case R.id.action_show_all:
 			ListAdapter adapter = null;
 

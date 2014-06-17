@@ -11,5 +11,6 @@
     <string name="connection_btn">Connexion</string>
     <string name="action_logout">Déconnexion</string>
     <string name="action_show_all">Montrer tout</string>
+    <string name="action_refresh">Actualiser</string>
     
 </resources>
